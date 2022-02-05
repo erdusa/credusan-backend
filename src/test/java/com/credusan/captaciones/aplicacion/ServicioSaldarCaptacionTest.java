@@ -4,20 +4,27 @@ import com.credusan.TestConfig;
 import com.credusan.asociados.aplicacion.ServicioCrearAsociado;
 import com.credusan.asociados.dominio.modelos.Asociado;
 import com.credusan.asociados.dominio.modelos.TipoDocumento;
+import com.credusan.captaciones.dominio.dtos.ConsultaCaptacionExtractoDTO;
 import com.credusan.captaciones.dominio.enums.EnumTipoCaptacion;
 import com.credusan.captaciones.dominio.enums.EnumTipoEstadoCaptacion;
 import com.credusan.captaciones.dominio.modelos.Captacion;
+import com.credusan.captaciones.dominio.modelos.CaptacionExtracto;
 import com.credusan.captaciones.dominio.modelos.TipoCaptacion;
 import com.credusan.captaciones.dominio.modelos.TipoEstadoCaptacion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +39,10 @@ class ServicioSaldarCaptacionTest {
     ServicioCrearCaptacion servicioCrearCaptacion;
     @Autowired
     ServicioConsultarCaptacion servicioConsultarCaptacion;
-
+    @Autowired
+    ServicioConsultarCaptacionExtracto servicioConsultarCaptacionExtracto;
+    @Autowired
+    ServicioCrearCaptacionExtracto servicioCrearCaptacionExtracto;
 
     Asociado asociado;
     Captacion captacion;
@@ -67,11 +77,52 @@ class ServicioSaldarCaptacionTest {
     }
 
     @Test
-    void deberiaSaldarCaptacion() throws Exception {
+    void deberiaSaldarCaptacionYNoCrearExtractoDeRetiro() throws Exception {
 
         Boolean respuesta = servicioSaldarCaptacion.saldar(captacionAhorros.getIdCaptacion());
 
+        Page<CaptacionExtracto> lista = obtenerExtractos(captacionAhorros);
+
+        assertTrue(lista.isEmpty());
+
         assertTrue(respuesta);
+    }
+
+    @Test
+    void deberiaSaldarCaptacionYCrearExtractoDeRetiro() throws Exception {
+
+        insertarConsignacion(captacionAhorros);
+
+        Boolean respuesta = servicioSaldarCaptacion.saldar(captacionAhorros.getIdCaptacion());
+
+        Page<CaptacionExtracto> lista = obtenerExtractos(captacionAhorros);
+
+        assertEquals(2, lista.getTotalElements());
+
+        assertTrue(respuesta);
+    }
+
+    private void insertarConsignacion(Captacion captacionAhorros) throws Exception {
+        CaptacionExtracto captacionExtracto = new CaptacionExtracto(
+                LocalDate.now(),
+                LocalTime.now(),
+                (double) 200000,
+                (double) 0
+        );
+
+        captacionExtracto.setCaptacion(captacionAhorros);
+
+        servicioCrearCaptacionExtracto.create(captacionExtracto);
+    }
+
+    private Page<CaptacionExtracto> obtenerExtractos(Captacion captacionAhorros) throws Exception {
+        Pageable page = PageRequest.of(0, 10);
+        ConsultaCaptacionExtractoDTO extractoDTO = new ConsultaCaptacionExtractoDTO();
+        extractoDTO.setIdCaptacion(captacionAhorros.getIdCaptacion());
+        extractoDTO.setFechaInicial(LocalDate.now());
+        extractoDTO.setFechaFinal(LocalDate.now());
+
+        return servicioConsultarCaptacionExtracto.getAllByIdCaptacionAndFechas(page, extractoDTO);
     }
 
     @Test

@@ -50,6 +50,11 @@ public class ServicioSaldarCaptacion {
     }
 
     private void retirarSaldoTotal(Captacion captacion) {
+
+        if (captacion.getSaldo() == 0) {
+            return;
+        }
+
         CaptacionExtracto captacionExtracto = new CaptacionExtracto();
         captacionExtracto.setCaptacion(captacion);
         captacionExtracto.setFecha(LocalDate.now());
