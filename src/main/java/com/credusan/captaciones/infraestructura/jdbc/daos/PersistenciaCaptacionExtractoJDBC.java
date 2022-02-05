@@ -14,6 +14,9 @@ import java.util.Map;
 
 public class PersistenciaCaptacionExtractoJDBC implements PersistenciaCaptacionExtracto {
 
+    private static final String SELECT_COMUN = "SELECT * FROM captacionextracto ce" +
+            " INNER JOIN captacion c using (captid)";
+
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert simpleJdbcInsert;
 
@@ -38,7 +41,7 @@ public class PersistenciaCaptacionExtractoJDBC implements PersistenciaCaptacionE
 
     private CaptacionExtracto getById(long idCaptacionExtracto) {
 
-        String sql = "select * from captacionextracto where capextid = ?";
+        String sql = SELECT_COMUN + " where capextid = ?";
 
         return jdbcTemplate.queryForObject(sql, new CaptacionExtractoRowMapper(), idCaptacionExtracto);
 
@@ -46,7 +49,7 @@ public class PersistenciaCaptacionExtractoJDBC implements PersistenciaCaptacionE
 
     @Override
     public List<CaptacionExtracto> getAllByIdCaptacionAndFechas(ConsultaCaptacionExtractoDTO extractoDTO) {
-        String sql = "select * from captacionextracto " +
+        String sql = SELECT_COMUN +
                 " where captid = ?" +
                 " and capextfecha between ? and ?" +
                 " order by capextfecha desc, capexthora desc";
