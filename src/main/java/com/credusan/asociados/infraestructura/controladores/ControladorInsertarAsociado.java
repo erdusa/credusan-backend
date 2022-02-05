@@ -15,7 +15,7 @@ import javax.validation.Valid;
 @RequestMapping("/asociados")
 public class ControladorInsertarAsociado {
 
-    private ServicioCrearAsociado service;
+    private final ServicioCrearAsociado service;
 
     public ControladorInsertarAsociado(ServicioCrearAsociado service) {
         this.service = service;

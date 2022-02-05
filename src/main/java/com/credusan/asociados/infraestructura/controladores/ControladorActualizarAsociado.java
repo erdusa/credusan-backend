@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/asociados")
 public class ControladorActualizarAsociado {
 
-    private ServicioActualizarAsociado service;
+    private final ServicioActualizarAsociado service;
 
     public ControladorActualizarAsociado(ServicioActualizarAsociado service) {
         this.service = service;

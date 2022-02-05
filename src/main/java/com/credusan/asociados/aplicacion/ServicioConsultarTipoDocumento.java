@@ -1,7 +1,7 @@
 package com.credusan.asociados.aplicacion;
 
 import com.credusan.asociados.dominio.modelos.TipoDocumento;
-import com.credusan.asociados.dominio.puertos.TipoDocumentoPersistence;
+import com.credusan.asociados.dominio.puertos.PersistenciaTipoDocumento;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,9 +9,9 @@ import java.util.List;
 @Service
 public class ServicioConsultarTipoDocumento {
 
-    private TipoDocumentoPersistence persistence;
+    private final PersistenciaTipoDocumento persistence;
 
-    public ServicioConsultarTipoDocumento(TipoDocumentoPersistence persistence) {
+    public ServicioConsultarTipoDocumento(PersistenciaTipoDocumento persistence) {
         this.persistence = persistence;
     }
 

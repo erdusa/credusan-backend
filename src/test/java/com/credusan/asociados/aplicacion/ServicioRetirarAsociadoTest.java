@@ -51,13 +51,13 @@ class ServicioRetirarAsociadoTest {
     }
 
     @Test
-    public void deberiaRetirarAsociado() throws Exception {
+    void deberiaRetirarAsociado() throws Exception {
 
         assertTrue(servicioRetirarAsociado.retirarAsociado(asociadoCreado.getIdAsociado()));
     }
 
     @Test
-    public void noDeberiaRetirarAsociadoSiEstaInactivo() throws Exception {
+    void noDeberiaRetirarAsociadoSiEstaInactivo() throws Exception {
         servicioRetirarAsociado.retirarAsociado(asociadoCreado.getIdAsociado());
 
         Exception thrown = assertThrows(Exception.class, () -> servicioRetirarAsociado.retirarAsociado(asociadoCreado.getIdAsociado()));
@@ -66,7 +66,7 @@ class ServicioRetirarAsociadoTest {
     }
 
     @Test
-    public void noDeberiaRetirarAsociadoSiTieneCaptacionesActivas() throws Exception {
+    void noDeberiaRetirarAsociadoSiTieneCaptacionesActivas() throws Exception {
         Captacion captacion = new Captacion(
                 new TipoCaptacion(EnumTipoCaptacion.AHORROS.id),
                 0,

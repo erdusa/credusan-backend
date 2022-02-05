@@ -4,6 +4,6 @@ import com.credusan.asociados.dominio.modelos.TipoDocumento;
 
 import java.util.List;
 
-public interface TipoDocumentoPersistence {
+public interface PersistenciaTipoDocumento {
     List<TipoDocumento> getAll() throws Exception;
 }

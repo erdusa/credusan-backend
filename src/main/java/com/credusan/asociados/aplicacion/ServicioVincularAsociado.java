@@ -6,6 +6,8 @@ import com.credusan.captaciones.dominio.puertos.PersistenciaCaptacion;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
+
 @Service
 public class ServicioVincularAsociado {
 
@@ -24,12 +26,12 @@ public class ServicioVincularAsociado {
 
         Asociado asociado = persistence.getById(idAsociado);
 
-        if (asociado.getActivo()) {
-            throw new Exception(EL_ASOCIADO_ESTA_ACTIVO);
+        if (Boolean.TRUE.equals(asociado.getActivo())) {
+            throw new ValidationException(EL_ASOCIADO_ESTA_ACTIVO);
         }
 
         asociado.setActivo(true);
-        Asociado asociadoU = persistence.save(asociado);
+        Asociado asociadoU = persistence.update(asociado);
 
         captacionPersistence.crearCuentaAportes(asociadoU);
 

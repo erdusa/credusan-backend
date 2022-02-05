@@ -3,50 +3,68 @@ package com.credusan.asociados.aplicacion;
 import com.credusan.asociados.dominio.modelos.Asociado;
 import com.credusan.asociados.dominio.modelos.Beneficiario;
 import com.credusan.asociados.dominio.puertos.PersistenciaAsociado;
+import com.credusan.asociados.dominio.puertos.PersistenciaBeneficiario;
 import com.credusan.captaciones.dominio.puertos.PersistenciaCaptacion;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
+import java.util.List;
+
 @Service
 public class ServicioCrearAsociado {
 
-    private final PersistenciaAsociado persistence;
-    private final PersistenciaCaptacion captacionPersistence;
+    private final PersistenciaAsociado persistenciaAsociado;
+    private final PersistenciaCaptacion persistenciaCaptacion;
+    private final PersistenciaBeneficiario persistenciaBeneficiario;
 
-    public ServicioCrearAsociado(PersistenciaAsociado persistenciaAsociado, PersistenciaCaptacion captacionPersistence) {
-        this.persistence = persistenciaAsociado;
-        this.captacionPersistence = captacionPersistence;
+    public ServicioCrearAsociado(PersistenciaAsociado persistenciaAsociado, PersistenciaCaptacion persistenciaCaptacion, PersistenciaBeneficiario persistenciaBeneficiario) {
+        this.persistenciaAsociado = persistenciaAsociado;
+        this.persistenciaCaptacion = persistenciaCaptacion;
+        this.persistenciaBeneficiario = persistenciaBeneficiario;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Asociado create(Asociado asociado) throws Exception {
 
         if (verificarSiTieneIdAsociado(asociado)) {
-            throw new Exception("El identificador del asociado no debe tener valor");
+            throw new ValidationException("El identificador del asociado no debe tener valor");
         }
 
-        if (verificarSiElPorcentajeBeneficiariosEstaErrado(asociado)) {
-            throw new Exception("Los porcentajes asignados a los beneficiarios deben sumar 100");
-        }
-        if (asociado.getBeneficiarios() != null) {
-            asociado.getBeneficiarios().forEach(beneficiario -> beneficiario.setAsociado(asociado));
+        if (verificarSiElPorcentajeBeneficiariosNoEsCeroNiCien(asociado)) {
+            throw new ValidationException("Los porcentajes asignados a los beneficiarios deben sumar 100");
         }
 
         asociado.setActivo(true);
-        Asociado asociadoCreado = persistence.save(asociado);
+        Asociado asociadoCreado = persistenciaAsociado.insert(asociado);
 
-        captacionPersistence.crearCuentaAportes(asociadoCreado);
+        insertarBeneficiarios(asociadoCreado, asociado.getBeneficiarios());
+
+        persistenciaCaptacion.crearCuentaAportes(asociadoCreado);
+
+        asociadoCreado.setBeneficiarios(persistenciaBeneficiario.getAllByIdAsociado(asociadoCreado.getIdAsociado()));
 
         return asociadoCreado;
+    }
+
+    private void insertarBeneficiarios(Asociado asociado, List<Beneficiario> listaBeneficiarios) throws Exception {
+        if (asociado.getBeneficiarios() == null) {
+            return;
+        }
+        for (Beneficiario beneficiario : listaBeneficiarios) {
+            beneficiario.setAsociado(asociado);
+            persistenciaBeneficiario.insert(beneficiario);
+        }
+
     }
 
     private boolean verificarSiTieneIdAsociado(@NonNull Asociado asociado) {
         return asociado.getIdAsociado() != null;
     }
 
-    private boolean verificarSiElPorcentajeBeneficiariosEstaErrado(@NonNull Asociado asociado) {
-        if (asociado.getBeneficiarios() == null || asociado.getBeneficiarios().size() == 0) {
+    private boolean verificarSiElPorcentajeBeneficiariosNoEsCeroNiCien(@NonNull Asociado asociado) {
+        if (asociado.getBeneficiarios() == null || asociado.getBeneficiarios().isEmpty()) {
             return false;
         }
         int totalPorcentaje = asociado.getBeneficiarios().stream()

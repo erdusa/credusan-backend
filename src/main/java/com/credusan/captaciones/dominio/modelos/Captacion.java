@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 public class Captacion {
-    private final static int TAMANIO_NUMERO_CUENTA_COMPLETO = 5;
+    private static final int TAMANIO_NUMERO_CUENTA_COMPLETO = 5;
 
     private Integer idCaptacion;
     private TipoCaptacion tipoCaptacion;

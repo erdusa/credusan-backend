@@ -7,12 +7,13 @@ import com.credusan.captaciones.dominio.modelos.TipoEstadoCaptacion;
 import com.credusan.captaciones.dominio.puertos.PersistenciaCaptacion;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ValidationException;
 import java.time.LocalDate;
 
 @Service
 public class ServicioCrearCaptacion {
 
-    private PersistenciaCaptacion repo;
+    private final PersistenciaCaptacion repo;
 
     public ServicioCrearCaptacion(PersistenciaCaptacion repo) {
         this.repo = repo;
@@ -20,11 +21,11 @@ public class ServicioCrearCaptacion {
 
     public Captacion create(Captacion captacion) throws Exception {
         if (captacion.getIdCaptacion() != null) {
-            throw new Exception("El identificador de la captación no debe tener valor");
+            throw new ValidationException("El identificador de la captación no debe tener valor");
         }
 
         if (verificarSiEsAportesYAsociadoYaTieneUnaActiva(captacion)) {
-            throw new Exception("El asociado ya tiene una cuenta de aportes activa");
+            throw new ValidationException("El asociado ya tiene una cuenta de aportes activa");
         }
 
         Integer numeroCuenta = repo.getMaxNumeroCuentaByTipoCaptacion(captacion.getTipoCaptacion().getIdTipoCaptacion());
@@ -34,7 +35,7 @@ public class ServicioCrearCaptacion {
         captacion.setNumeroCuenta(numeroCuenta);
         captacion.setSaldo((double) 0);
 
-        return repo.save(captacion);
+        return repo.insert(captacion);
     }
 
     private boolean verificarSiEsAportesYAsociadoYaTieneUnaActiva(Captacion captacion) throws Exception {

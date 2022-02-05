@@ -9,7 +9,7 @@ import java.util.List;
 @Service
 public class ServicioConsultarCaptacion {
 
-    private PersistenciaCaptacion repo;
+    private final PersistenciaCaptacion repo;
 
     public ServicioConsultarCaptacion(PersistenciaCaptacion repo) {
         this.repo = repo;

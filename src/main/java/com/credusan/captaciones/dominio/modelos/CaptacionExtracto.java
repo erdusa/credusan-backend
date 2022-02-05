@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 @Data
 public class CaptacionExtracto {
@@ -23,6 +24,10 @@ public class CaptacionExtracto {
         this.setHora(hora);
         this.setValorDebito(valorDebito);
         this.setValorCredito(valorCredito);
+    }
+
+    public void setHora(LocalTime hora) {
+        this.hora = hora.truncatedTo(ChronoUnit.SECONDS);
     }
 
     @Override

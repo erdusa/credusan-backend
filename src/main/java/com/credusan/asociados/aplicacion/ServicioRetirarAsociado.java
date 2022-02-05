@@ -9,6 +9,7 @@ import com.credusan.captaciones.dominio.puertos.PersistenciaCaptacion;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
 import java.util.List;
 
 @Service
@@ -29,16 +30,16 @@ public class ServicioRetirarAsociado {
     public Boolean retirarAsociado(int idAsociado) throws Exception {
 
         Asociado asociado = persistenciaAsociado.getById(idAsociado);
-        if (!asociado.getActivo()) {
-            throw new Exception(EL_ASOCIADO_NO_ESTA_ACTIVO);
+        if (Boolean.FALSE.equals(asociado.getActivo())) {
+            throw new ValidationException(EL_ASOCIADO_NO_ESTA_ACTIVO);
         }
 
         asociado.setActivo(false);
-        Asociado asociadoRetirado = persistenciaAsociado.save(asociado);
+        Asociado asociadoRetirado = persistenciaAsociado.update(asociado);
 
         Captacion cuentaAportes = captacionPersistence.getCuentaAportes(asociadoRetirado.getIdAsociado());
         if (cuentaAportes == null) {
-            throw new Exception(NO_TIENE_CUENTA_DE_APORTES_ACTIVA);
+            throw new ValidationException(NO_TIENE_CUENTA_DE_APORTES_ACTIVA);
         }
 
         List<Captacion> captaciones = captacionPersistence.getAllByIdAsociado(asociadoRetirado.getIdAsociado());
@@ -46,12 +47,12 @@ public class ServicioRetirarAsociado {
                 .anyMatch(c -> c.getTipoEstadoCaptacion().getIdTipoEstadoCaptacion().equals(EnumTipoEstadoCaptacion.ACTIVA.id)
                         && !c.getTipoCaptacion().getIdTipoCaptacion().equals(EnumTipoCaptacion.APORTES.id));
         if (tieneCaptacionesActivas) {
-            throw new Exception(EL_ASOCIADO_TIENE_CAPTACIONES_ACTIVAS);
+            throw new ValidationException(EL_ASOCIADO_TIENE_CAPTACIONES_ACTIVAS);
         }
 
         cuentaAportes.getTipoEstadoCaptacion().setIdTipoEstadoCaptacion(EnumTipoEstadoCaptacion.SALDADA.id);
 
-        Captacion captacionSaldada = captacionPersistence.save(cuentaAportes);
+        captacionPersistence.update(cuentaAportes);
 
         return !asociadoRetirado.getActivo();
     }

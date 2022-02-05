@@ -7,6 +7,7 @@ import com.credusan.captaciones.dominio.puertos.PersistenciaCaptacionExtracto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -31,19 +32,19 @@ public class ServicioCrearCaptacionExtracto {
     public CaptacionExtracto create(CaptacionExtracto captacionExtracto) throws Exception {
 
         if (captacionExtracto.getValorDebito() > 0 && captacionExtracto.getValorCredito() > 0) {
-            throw new Exception(NO_PUEDE_ASIGNAR_VALOR_DEBITO_Y_CREDITO_AL_MISMO_TIEMPO);
+            throw new ValidationException(NO_PUEDE_ASIGNAR_VALOR_DEBITO_Y_CREDITO_AL_MISMO_TIEMPO);
         }
 
         if (captacionExtracto.getValorDebito() < 0) {
-            throw new Exception(EL_VALOR_DEBITO_NO_PUEDE_SER_MENOR_QUE_CERO);
+            throw new ValidationException(EL_VALOR_DEBITO_NO_PUEDE_SER_MENOR_QUE_CERO);
         }
 
         if (captacionExtracto.getValorCredito() < 0) {
-            throw new Exception(EL_VALOR_CREDITO_NO_PUEDE_SER_MENOR_QUE_CERO);
+            throw new ValidationException(EL_VALOR_CREDITO_NO_PUEDE_SER_MENOR_QUE_CERO);
         }
 
         if (captacionExtracto.getValorDebito() <= 0 && captacionExtracto.getValorCredito() <= 0) {
-            throw new Exception(EL_VALOR_DEBITO_O_CREDITO_DEBE_SER_MAYOR_A_CERO);
+            throw new ValidationException(EL_VALOR_DEBITO_O_CREDITO_DEBE_SER_MAYOR_A_CERO);
         }
 
         double saldoSumar = captacionExtracto.getValorDebito() - captacionExtracto.getValorCredito();
@@ -53,7 +54,7 @@ public class ServicioCrearCaptacionExtracto {
         captacionExtracto.setFecha(LocalDate.now());
         captacionExtracto.setHora(LocalTime.now());
 
-        return repo.save(captacionExtracto);
+        return repo.insert(captacionExtracto);
 
     }
 
@@ -64,8 +65,8 @@ public class ServicioCrearCaptacionExtracto {
         captacion.setSaldo(captacion.getSaldo() + saldoSumar);
 
         if (captacion.getSaldo() < 0) {
-            throw new Exception(EL_SALDO_NO_PUEDE_QUEDAR_NEGATIVO);
+            throw new ValidationException(EL_SALDO_NO_PUEDE_QUEDAR_NEGATIVO);
         }
-        return persistenciaCaptacion.save(captacion);
+        return persistenciaCaptacion.update(captacion);
     }
 }

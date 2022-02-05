@@ -17,6 +17,7 @@ public class ConsultaCaptacionExtractoDTO {
     private LocalDate fechaInicial;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaFinal;
-
+    private int numeroPagina;
+    private int registrosPorPagina;
 
 }
