@@ -50,9 +50,9 @@ public class PersistenciaCaptacionExtractoJDBC implements PersistenciaCaptacionE
     @Override
     public List<CaptacionExtracto> getAllByIdCaptacionAndFechas(ConsultaCaptacionExtractoDTO extractoDTO) {
         String sql = SELECT_COMUN +
-                " where captid = ?" +
-                " and capextfecha between ? and ?" +
-                " order by capextfecha desc, capexthora desc";
+                " where c.captid = ?" +
+                " and ce.capextfecha between ? and ?" +
+                " order by ce.capextfecha desc, ce.capexthora desc";
 
         if (extractoDTO.getFechaInicial() == null) {
             extractoDTO.setFechaInicial(LocalDate.of(1, 1, 1));

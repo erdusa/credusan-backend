@@ -49,7 +49,7 @@ public class ServicioCrearAsociado {
     }
 
     private void insertarBeneficiarios(Asociado asociado, List<Beneficiario> listaBeneficiarios) throws Exception {
-        if (asociado.getBeneficiarios() == null) {
+        if (listaBeneficiarios == null) {
             return;
         }
         for (Beneficiario beneficiario : listaBeneficiarios) {

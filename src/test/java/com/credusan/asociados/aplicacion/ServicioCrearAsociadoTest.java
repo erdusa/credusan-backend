@@ -44,7 +44,6 @@ class ServicioCrearAsociadoTest {
         Asociado asociadoActual = servicioCrearAsociado.create(asociado);
         assertNotNull(asociadoActual.getIdAsociado());
     }
-
     @Test
     public void deberiaCrearAsociadoSiPorcentajeBeneficiariosIgualA100() throws Exception {
         asociado.setBeneficiarios(new ArrayList<>());
@@ -52,6 +51,7 @@ class ServicioCrearAsociadoTest {
 
         Asociado asociadoActual = servicioCrearAsociado.create(asociado);
         assertNotNull(asociadoActual.getIdAsociado());
+        assertEquals(1, asociadoActual.getBeneficiarios().size());
     }
 
     @Test
