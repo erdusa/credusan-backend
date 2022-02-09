@@ -1,6 +1,7 @@
 package com.credusan.captaciones.aplicacion;
 
 import com.credusan.TestConfig;
+import com.credusan.TestSqlUtils;
 import com.credusan.asociados.aplicacion.ServicioCrearAsociado;
 import com.credusan.asociados.dominio.modelos.Asociado;
 import com.credusan.asociados.dominio.modelos.TipoDocumento;
@@ -10,14 +11,10 @@ import com.credusan.captaciones.dominio.modelos.CaptacionExtracto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 
-import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -44,8 +41,7 @@ class ServicioConsultarCaptacionExtractoTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        DataSource dataSource = new DriverManagerDataSource("jdbc:h2:mem:testdb", "sa", "password");
-        ScriptUtils.executeSqlScript(dataSource.getConnection(), new ClassPathResource("sql-scripts/test-data-captacion.sql"));
+        TestSqlUtils.executeQuery("test-data-captacion.sql");
 
         asociado = new Asociado(
                 new TipoDocumento(3),

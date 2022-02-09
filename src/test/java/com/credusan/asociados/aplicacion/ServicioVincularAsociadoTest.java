@@ -1,16 +1,13 @@
 package com.credusan.asociados.aplicacion;
 
 import com.credusan.TestConfig;
+import com.credusan.TestSqlUtils;
 import com.credusan.asociados.dominio.modelos.Asociado;
 import com.credusan.asociados.dominio.modelos.TipoDocumento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 
-import javax.sql.DataSource;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,8 +26,7 @@ class ServicioVincularAsociadoTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        DataSource dataSource = new DriverManagerDataSource("jdbc:h2:mem:testdb", "sa", "password");
-        ScriptUtils.executeSqlScript(dataSource.getConnection(), new ClassPathResource("sql-scripts/test-data-captacion.sql"));
+        TestSqlUtils.executeQuery("test-data-asociado.sql");
 
         Asociado asociado = new Asociado(
                 new TipoDocumento(3),
@@ -46,12 +42,12 @@ class ServicioVincularAsociadoTest {
     }
 
     @Test
-    public void deberiaVincularAsociado() throws Exception {
+    void deberiaVincularAsociado() throws Exception {
         assertTrue(servicioVincularAsociado.vincular(asociadoCreado.getIdAsociado()));
     }
 
     @Test
-    public void noDeberiaVincularAsociadoSiEstaActivo() throws Exception {
+    void noDeberiaVincularAsociadoSiEstaActivo() throws Exception {
         servicioVincularAsociado.vincular(asociadoCreado.getIdAsociado());
 
         Exception thrown = assertThrows(Exception.class, () -> servicioVincularAsociado.vincular(asociadoCreado.getIdAsociado()));

@@ -1,6 +1,7 @@
 package com.credusan.asociados.aplicacion;
 
 import com.credusan.TestConfig;
+import com.credusan.TestSqlUtils;
 import com.credusan.asociados.dominio.modelos.Asociado;
 import com.credusan.asociados.dominio.modelos.Beneficiario;
 import com.credusan.asociados.dominio.modelos.TipoDocumento;
@@ -8,11 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 
-import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -31,8 +28,7 @@ class ServicioActualizarAsociadoTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        DataSource dataSource = new DriverManagerDataSource("jdbc:h2:mem:testdb", "sa", "password");
-        ScriptUtils.executeSqlScript(dataSource.getConnection(), new ClassPathResource("sql-scripts/test-data-asociado.sql"));
+        TestSqlUtils.executeQuery("test-data-asociado.sql");
 
         asociado = new Asociado(
                 new TipoDocumento(3),
@@ -49,7 +45,7 @@ class ServicioActualizarAsociadoTest {
     }
 
     @Test
-    public void deberiaActualizarAsociadoSiPorcentajeBeneficiariosIgualA100() throws Exception {
+    void deberiaActualizarAsociadoSiPorcentajeBeneficiariosIgualA100() throws Exception {
 
         Asociado asociadoU = asociadoCreado;
         asociadoU.setTipoDocumento(new TipoDocumento(2));
@@ -67,7 +63,7 @@ class ServicioActualizarAsociadoTest {
     }
 
     @Test
-    public void noDeberiaActualizarAsociadoSiPorcentajeBeneficiariosDiferenteDe100() {
+    void noDeberiaActualizarAsociadoSiPorcentajeBeneficiariosDiferenteDe100() {
 
         Asociado asociadoU = new Asociado();
         BeanUtils.copyProperties(asociadoCreado, asociadoU);
@@ -82,7 +78,7 @@ class ServicioActualizarAsociadoTest {
     }
 
     @Test
-    public void noDeberiaActualizarAsociadoSiNoExiste() {
+    void noDeberiaActualizarAsociadoSiNoExiste() {
         asociado.setIdAsociado(0);
 
         Exception thrown = assertThrows(Exception.class, () -> servicioActualizarAsociado.update(asociado.getIdAsociado(), asociado));
@@ -91,7 +87,7 @@ class ServicioActualizarAsociadoTest {
     }
 
     @Test
-    public void noDeberiaActualizarAsociadoSiIntentaInactivarlo() {
+    void noDeberiaActualizarAsociadoSiIntentaInactivarlo() {
         asociadoCreado.setActivo(false);
 
         Exception thrown = assertThrows(Exception.class, () -> servicioActualizarAsociado.update(asociadoCreado.getIdAsociado(), asociadoCreado));
@@ -100,7 +96,7 @@ class ServicioActualizarAsociadoTest {
     }
 
     @Test
-    public void deberiaActualizarDeTenerANoTenerBeneficiarios() throws Exception {
+    void deberiaActualizarDeTenerANoTenerBeneficiarios() throws Exception {
 
         asociadoCreado.setBeneficiarios(null);
 
@@ -110,7 +106,7 @@ class ServicioActualizarAsociadoTest {
     }
 
     @Test
-    public void deberiaActualizarDeNoTenerATenerBeneficiarios() throws Exception {
+    void deberiaActualizarDeNoTenerATenerBeneficiarios() throws Exception {
 
         Asociado asociadoU = new Asociado();
         asociadoU.setTipoDocumento(new TipoDocumento(2));

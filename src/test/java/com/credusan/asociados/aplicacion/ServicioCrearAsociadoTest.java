@@ -1,17 +1,14 @@
 package com.credusan.asociados.aplicacion;
 
 import com.credusan.TestConfig;
+import com.credusan.TestSqlUtils;
 import com.credusan.asociados.dominio.modelos.Asociado;
 import com.credusan.asociados.dominio.modelos.Beneficiario;
 import com.credusan.asociados.dominio.modelos.TipoDocumento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 
-import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -27,8 +24,7 @@ class ServicioCrearAsociadoTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        DataSource dataSource = new DriverManagerDataSource("jdbc:h2:mem:testdb", "sa", "password");
-        ScriptUtils.executeSqlScript(dataSource.getConnection(), new ClassPathResource("sql-scripts/test-data-asociado.sql"));
+        TestSqlUtils.executeQuery("test-data-asociado.sql");
 
         asociado = new Asociado(
                 new TipoDocumento(3),
@@ -40,12 +36,13 @@ class ServicioCrearAsociadoTest {
     }
 
     @Test
-    public void deberiaCrearAsociadoSinBeneficiarios() throws Exception {
+    void deberiaCrearAsociadoSinBeneficiarios() throws Exception {
         Asociado asociadoActual = servicioCrearAsociado.create(asociado);
         assertNotNull(asociadoActual.getIdAsociado());
     }
+
     @Test
-    public void deberiaCrearAsociadoSiPorcentajeBeneficiariosIgualA100() throws Exception {
+    void deberiaCrearAsociadoSiPorcentajeBeneficiariosIgualA100() throws Exception {
         asociado.setBeneficiarios(new ArrayList<>());
         asociado.getBeneficiarios().add(new Beneficiario("carlos", "perez", "diaz", 100));
 
@@ -55,7 +52,7 @@ class ServicioCrearAsociadoTest {
     }
 
     @Test
-    public void noDeberiaCrearAsociadoSiIdAsociadoTieneValorAsignado() {
+    void noDeberiaCrearAsociadoSiIdAsociadoTieneValorAsignado() {
 
         asociado.setIdAsociado(1);
 
@@ -66,7 +63,7 @@ class ServicioCrearAsociadoTest {
     }
 
     @Test
-    public void noDeberiaCrearAsociadoSiPorcentajeBeneficiariosDiferenteDe100() {
+    void noDeberiaCrearAsociadoSiPorcentajeBeneficiariosDiferenteDe100() {
         asociado.setBeneficiarios(new ArrayList<>());
         asociado.getBeneficiarios().add(new Beneficiario("carlos", "perez", "diaz", 50));
 

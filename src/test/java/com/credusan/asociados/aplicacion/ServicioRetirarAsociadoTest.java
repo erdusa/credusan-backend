@@ -1,6 +1,7 @@
 package com.credusan.asociados.aplicacion;
 
 import com.credusan.TestConfig;
+import com.credusan.TestSqlUtils;
 import com.credusan.asociados.dominio.modelos.Asociado;
 import com.credusan.asociados.dominio.modelos.TipoDocumento;
 import com.credusan.captaciones.aplicacion.ServicioCrearCaptacion;
@@ -12,9 +13,6 @@ import com.credusan.captaciones.dominio.modelos.TipoEstadoCaptacion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
@@ -36,8 +34,7 @@ class ServicioRetirarAsociadoTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        dataSource = new DriverManagerDataSource("jdbc:h2:mem:testdb", "sa", "password");
-        ScriptUtils.executeSqlScript(dataSource.getConnection(), new ClassPathResource("sql-scripts/test-data-asociado.sql"));
+        TestSqlUtils.executeQuery("test-data-asociado.sql");
 
         Asociado asociado = new Asociado(
                 new TipoDocumento(3),
@@ -81,13 +78,4 @@ class ServicioRetirarAsociadoTest {
 
         assertEquals(ServicioRetirarAsociado.EL_ASOCIADO_TIENE_CAPTACIONES_ACTIVAS, thrown.getMessage());
     }
-
-/*    @Test
-    public void noDeberiaRetirarAsociadoSiCuentaAportesEstaInactiva() throws Exception {
-        ScriptUtils.executeSqlScript(dataSource.getConnection(), new ClassPathResource("sql-scripts/test-inactivar-aportes.sql"));
-
-        Exception thrown = assertThrows(Exception.class, () -> servicioRetirarAsociado.retirarAsociado(asociadoCreado.getIdAsociado()));
-
-        assertEquals(ServicioRetirarAsociado.NO_TIENE_CUENTA_DE_APORTES_ACTIVA, thrown.getMessage());
-    }*/
 }

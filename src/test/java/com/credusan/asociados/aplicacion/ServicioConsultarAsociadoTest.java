@@ -1,19 +1,18 @@
 package com.credusan.asociados.aplicacion;
 
 import com.credusan.TestConfig;
+import com.credusan.TestSqlUtils;
 import com.credusan.asociados.dominio.modelos.Asociado;
+import com.credusan.asociados.dominio.modelos.Beneficiario;
 import com.credusan.asociados.dominio.modelos.TipoDocumento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 
-import javax.sql.DataSource;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,9 +31,7 @@ class ServicioConsultarAsociadoTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        DataSource dataSource = new DriverManagerDataSource("jdbc:h2:mem:testdb", "sa", "password");
-        ScriptUtils.executeSqlScript(dataSource.getConnection(), new ClassPathResource("sql-scripts/test-data-asociado.sql"));
-
+        TestSqlUtils.executeQuery("test-data-asociado.sql");
         asociado = new Asociado(
                 new TipoDocumento(3),
                 "202020",
@@ -45,7 +42,7 @@ class ServicioConsultarAsociadoTest {
     }
 
     @Test
-    public void noDeberiaRetornarRegistros() throws Exception {
+    void noDeberiaRetornarRegistros() throws Exception {
 
         Pageable page = PageRequest.of(0, 1);
 
@@ -53,7 +50,7 @@ class ServicioConsultarAsociadoTest {
     }
 
     @Test
-    public void deberiaRetornarCincoRegistros() throws Exception {
+    void deberiaRetornarCincoRegistros() throws Exception {
         asociado.setNumeroDocumento("1");
         servicioCrearAsociado.create(asociado);
         asociado.setNumeroDocumento("2");
@@ -74,12 +71,12 @@ class ServicioConsultarAsociadoTest {
     //////// Test para getAllByNames
 
     @Test
-    public void noDeberiaRetornarRegistrosPorNombre() throws Exception {
+    void noDeberiaRetornarRegistrosPorNombre() throws Exception {
         assertEquals(0, servicioConsultarAsociado.getAllByNameOrSurnames("").size());
     }
 
     @Test
-    public void deberiaRetornarRegistrosPorNombres() throws Exception {
+    void deberiaRetornarRegistrosPorNombres() throws Exception {
         asociado.setNumeroDocumento("1");
         asociado.setNombres("pedro maria");
         asociado.setPrimerApellido("pascasio");
@@ -113,6 +110,27 @@ class ServicioConsultarAsociadoTest {
         assertEquals(1, servicioConsultarAsociado.getAllByNameOrSurnames("maria rodriguez ascanio").size());
         assertEquals(1, servicioConsultarAsociado.getAllByNameOrSurnames("lucy maria ascanio").size());
         assertTrue(servicioConsultarAsociado.getAllByNameOrSurnames("maria").stream().allMatch(Asociado::getActivo));
+    }
+
+    @Test
+    void deberiaRetornarLosBeneficiarios() throws Exception {
+        asociado.setNumeroDocumento("1");
+        asociado.setNombres("pedro maria");
+        asociado.setPrimerApellido("pascasio");
+        asociado.setSegundoApellido("perez");
+
+        asociado.setBeneficiarios(new ArrayList<>());
+        asociado.getBeneficiarios().add(new Beneficiario("carlos", "perez", "diaz", 20));
+        asociado.getBeneficiarios().add(new Beneficiario("carlos", "perez", "diaz", 80));
+        servicioCrearAsociado.create(asociado);
+
+        Asociado asociadoConsultado = servicioConsultarAsociado.getAllByNameOrSurnames("").stream()
+                .findFirst()
+                .orElse(new Asociado());
+
+        assertEquals(2, asociadoConsultado.getBeneficiarios().size());
+        assertTrue(asociadoConsultado.getBeneficiarios().stream().anyMatch(b -> b.getPorcentaje().equals(20)));
+        assertTrue(asociadoConsultado.getBeneficiarios().stream().anyMatch(b -> b.getPorcentaje().equals(80)));
     }
 
 }
