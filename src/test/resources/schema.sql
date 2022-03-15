@@ -89,3 +89,43 @@ CREATE TABLE public.captacionextracto (
 );
 
 ALTER TABLE public.captacionextracto ADD CONSTRAINT fk_capext_capt FOREIGN KEY (captid) REFERENCES captacion(captid);
+
+----------------------CREDITOS-------------------------------
+
+-- SCHEMA creditos;
+CREATE SCHEMA creditos;
+
+-- CREDITOS.TIPOESTADOCREDITO
+
+CREATE TABLE creditos.tipoestadocredito (
+	tiescrid int2 NOT NULL,
+	tiescrnombre varchar(30) NOT NULL,
+	CONSTRAINT tipoestadocredito_pk PRIMARY KEY (tiescrid)
+);
+
+--CREDITOS.CREDITO
+
+CREATE TABLE creditos.credito (
+	credid serial NOT NULL,
+	crednumero int4 NOT NULL,
+	credvalor int8 NOT NULL,
+	credfechadesembolso date NOT NULL,
+	tiescrid int2 NOT NULL,
+	asocid int4 NOT NULL,
+	credplazo int2 NOT NULL,
+	CONSTRAINT credito_pk PRIMARY KEY (credid)
+);
+
+ALTER TABLE creditos.credito ADD CONSTRAINT cred_tiescr_fk FOREIGN KEY (tiescrid) REFERENCES creditos.tipoestadocredito(tiescrid);
+
+-- CREDITOS.CREDITOLIQUIDACION
+
+CREATE TABLE creditos.creditoliquidacion (
+	credid int4 NOT NULL,
+	creliqnumerocuota int2 NOT NULL,
+	creliqfechapago date NOT NULL,
+	creliqfechapagada date NULL,
+	CONSTRAINT creditoliquidacion_pk PRIMARY KEY (credid, creliqnumerocuota)
+);
+
+ALTER TABLE creditos.creditoliquidacion ADD CONSTRAINT creliq_cred_fk FOREIGN KEY (credid) REFERENCES creditos.credito(credid);
