@@ -21,7 +21,7 @@ public class ServicioCrearCredito {
     public static final String FALTA_EL_PLAZO = "No se especificó el plazo del crédito";
     public static final String FALTA_EL_VALOR = "No se especificó el valor del crédito";
     public static final String FALTA_EL_DEUDOR = "No se especificó el deudor del crédito";
-    public static final String FALTA_TASA_INTERES = "No se especificó la tasa de interés del crédito";
+    public static final String FALTA_TASA_INTERES = "La tasa de interés debe ser mayor o igual que cero";
     public static final String TASA_MORA_NEGATIVA = "La tasa de mora no puede ser negativa";
 
     private final PersistenciaCredito persistenciaCredito;
@@ -70,7 +70,7 @@ public class ServicioCrearCredito {
             throw new ValidationException(FALTA_EL_VALOR);
         }
 
-        if (Objects.requireNonNullElse(credito.getTasaInteres(), 0F) <= 0) {
+        if (credito.getTasaInteres() == null || credito.getTasaInteres() < 0) {
             throw new ValidationException(FALTA_TASA_INTERES);
         }
 

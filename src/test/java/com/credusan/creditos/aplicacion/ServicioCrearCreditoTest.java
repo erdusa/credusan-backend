@@ -162,18 +162,6 @@ class ServicioCrearCreditoTest {
     }
 
     @Test
-    void noDebeCrearCreditoSiTasaInteresEsCero() {
-        Credito credito = new CreditoTestDataBuilder().conTasaInteres(0F).build();
-
-        Exception thrown = assertThrows(Exception.class, () -> servicioCrearCredito.ejecutar(credito));
-
-        assertEquals(ServicioCrearCredito.FALTA_TASA_INTERES, thrown.getMessage());
-        Mockito.verify(persistenciaCredito, Mockito.times(0)).insert(Mockito.any());
-        Mockito.verify(persistenciaCreditoLiquidacion, Mockito.times(0)).insert(Mockito.any());
-
-    }
-
-    @Test
     void noDebeCrearCreditoSiTasaInteresEsNegativo() {
         Credito credito = new CreditoTestDataBuilder().conTasaInteres(-1F).build();
 
