@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TipoEstadoCredito {
-    private short idTipoEstadoCredito;
+    private Short idTipoEstadoCredito;
     private String nombre;
 
     public TipoEstadoCredito(short idTipoEstadoCredito) {

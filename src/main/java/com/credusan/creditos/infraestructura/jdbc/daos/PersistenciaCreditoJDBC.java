@@ -36,9 +36,12 @@ public class PersistenciaCreditoJDBC implements PersistenciaCredito {
 
     @Override
     public List<Credito> getAllByIdAsociado(Integer idAsociado) {
-        String sql = "SELECT * FROM creditos.credito" +
+
+        String sql = "SELECT * " +
+                " FROM creditos.credito" +
                 " INNER JOIN creditos.tipoestadocredito USING(tiescrid)" +
-                " WHERE asocid = ?";
+                " WHERE asocid = ?" +
+                " ORDER BY crednumero";
 
         return this.jdbcTemplate.query(sql, new CreditoRowMapper(), idAsociado);
     }
